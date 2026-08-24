@@ -1,5 +1,7 @@
 # Cell War —— 桌游电子化（Godot）
 
+[![tests](https://github.com/Kevinnb66699/SpringSense-2026-2027-Cell-War/actions/workflows/tests.yml/badge.svg)](https://github.com/Kevinnb66699/SpringSense-2026-2027-Cell-War/actions/workflows/tests.yml)
+
 《Cell War》是一款免疫细胞 vs 癌细胞的对抗桌游（ver.0.98）。本仓库是其电子化版本，使用 **Godot 4** 引擎开发。
 
 ## 仓库结构
