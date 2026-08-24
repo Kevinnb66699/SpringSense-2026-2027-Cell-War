@@ -90,6 +90,7 @@ func lose_biomass(n: int) -> int:
 func die() -> void:
 	alive = false
 	biomass = 0
+	stunned = false
 	vulnerable = false
 	dodge_next = false
 	keratin_next = false

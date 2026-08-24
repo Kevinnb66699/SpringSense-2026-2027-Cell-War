@@ -1,0 +1,25 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  headless-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Godot 4.5
+        run: |
+          curl -sL https://github.com/godotengine/godot/releases/download/4.5-stable/Godot_v4.5-stable_linux.x86_64.zip -o godot.zip
+          unzip -q godot.zip
+          chmod +x Godot_v4.5-stable_linux.x86_64
+
+      - name: Import project (generate .godot cache)
+        run: ./Godot_v4.5-stable_linux.x86_64 --headless --path game --import
+
+      - name: Run headless tests
+        run: ./Godot_v4.5-stable_linux.x86_64 --headless --path game -s tests/headless_test.gd
