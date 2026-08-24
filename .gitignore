@@ -1,0 +1,16 @@
+# Godot 4
+game/.godot/
+*.translation
+
+# Godot export
+game/export/
+*.pck
+*.exe.import
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
