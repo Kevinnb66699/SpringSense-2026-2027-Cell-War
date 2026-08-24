@@ -232,7 +232,7 @@ func _draw() -> void:
 			draw_circle(ppos, rad * 1.18, ring)
 			draw_circle(ppos, rad, Color("#f4fbfd"))
 			if font != null:
-				var letter2 := p.pname.substr(p.pname.length() - 1, 1)
+				var letter2: String = p.pname.substr(p.pname.length() - 1, 1)
 				var fs3 := int(rad * 1.2)
 				var tcol := Color("#1b6b8a") if p.is_immune() else Color("#a33540")
 				draw_string(font, ppos + Vector2(-rad, rad * 0.45), letter2,

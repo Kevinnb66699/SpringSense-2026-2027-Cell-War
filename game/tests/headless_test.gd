@@ -15,6 +15,7 @@ func check(cond: bool, msg: String) -> void:
 
 func _init() -> void:
 	print("=== Cell War 无头测试开始 ===")
+	_test_all_scripts_compile()
 	_test_hexlib()
 	var seeds := [11, 22, 33, 44]
 	for i in range(seeds.size()):
@@ -25,6 +26,34 @@ func _init() -> void:
 	else:
 		printerr("=== %d 项检查失败 ===" % failures)
 	quit(failures)
+
+
+## 加载全部 .gd 脚本与主场景，确保没有解析错误（UI 脚本不会被对局测试覆盖）
+func _test_all_scripts_compile() -> void:
+	var to_scan: Array[String] = ["res://scripts", "res://tests"]
+	var n_checked := 0
+	while not to_scan.is_empty():
+		var dir_path: String = to_scan.pop_back()
+		var dir := DirAccess.open(dir_path)
+		if dir == null:
+			check(false, "无法打开目录 " + dir_path)
+			continue
+		dir.list_dir_begin()
+		var fname := dir.get_next()
+		while fname != "":
+			var full := dir_path + "/" + fname
+			if dir.current_is_dir():
+				if not fname.begins_with("."):
+					to_scan.append(full)
+			elif fname.ends_with(".gd"):
+				var res = load(full)
+				check(res != null, "脚本解析失败: " + full)
+				n_checked += 1
+			fname = dir.get_next()
+		dir.list_dir_end()
+	var scene = load("res://scenes/Main.tscn")
+	check(scene != null, "主场景加载失败: res://scenes/Main.tscn")
+	print("脚本编译检查完成（%d 个脚本 + 主场景）" % n_checked)
 
 
 func _test_hexlib() -> void:

@@ -48,14 +48,15 @@ func _make_theme() -> Theme:
 	btn_normal.content_margin_right = 12.0
 	btn_normal.content_margin_top = 7.0
 	btn_normal.content_margin_bottom = 7.0
-	var btn_hover := btn_normal.duplicate()
+	var btn_hover: StyleBoxFlat = btn_normal.duplicate()
 	btn_hover.bg_color = Color("#2a4a58")
-	var btn_pressed := btn_normal.duplicate()
+	var btn_pressed: StyleBoxFlat = btn_normal.duplicate()
 	btn_pressed.bg_color = Color("#35607a")
+	var btn_focus: StyleBoxFlat = btn_hover.duplicate()
 	th.set_stylebox("normal", "Button", btn_normal)
 	th.set_stylebox("hover", "Button", btn_hover)
 	th.set_stylebox("pressed", "Button", btn_pressed)
-	th.set_stylebox("focus", "Button", btn_hover.duplicate())
+	th.set_stylebox("focus", "Button", btn_focus)
 	th.set_color("font_color", "Button", Color("#dfe9ec"))
 	th.set_color("font_hover_color", "Button", Color("#ffffff"))
 	th.set_color("font_pressed_color", "Button", Color("#ffffff"))
@@ -263,7 +264,7 @@ func _run_async() -> void:
 func _refresh() -> void:
 	var threshold: int = game.win_threshold()
 	var count: int = game.board.cancer_tissue_count()
-	var line := game.phase_text
+	var line: String = game.phase_text
 	if game.setup_done:
 		line += "\n癌组织 %d / %d（癌细胞获胜线）" % [count, threshold]
 	top_label.text = line
