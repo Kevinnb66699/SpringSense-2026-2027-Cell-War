@@ -16,6 +16,7 @@ var log_rtl: RichTextLabel
 var menu_layer: CenterContainer
 var menu_vbox: VBoxContainer
 var dice_overlay: DiceOverlay
+var side_panel: VBoxContainer
 
 
 func _ready() -> void:
@@ -115,7 +116,9 @@ func _build_ui() -> void:
 	side.custom_minimum_size = Vector2(510, 0)
 	side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	side.add_theme_constant_override("separation", 8)
+	side.visible = false   # 主菜单阶段隐藏，开局后显示
 	hbox.add_child(side)
+	side_panel = side
 
 	# 标题与状态
 	var head := PanelContainer.new()
@@ -266,6 +269,7 @@ func _menu_row(buttons: Array) -> void:
 
 func _start(n_players: int, mode: String, human_faction: String) -> void:
 	menu_layer.visible = false
+	side_panel.visible = true
 	log_rtl.clear()
 	pending_req = {}
 	if mode == "demo":
