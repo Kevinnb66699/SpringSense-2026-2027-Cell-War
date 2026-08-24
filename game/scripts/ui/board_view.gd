@@ -177,7 +177,7 @@ func _draw() -> void:
 			var fs := int(hex_size * 0.52)
 			draw_string(font, center + Vector2(-hex_size, hex_size * 0.18), letter,
 				HORIZONTAL_ALIGNMENT_CENTER, hex_size * 2.0, fs, Color(1, 1, 1, 0.92))
-			var fs2 := maxi(int(hex_size * 0.24), 8)
+			var fs2 := maxi(int(hex_size * 0.27), 10)
 			draw_string(font, center + Vector2(-hex_size, hex_size * 0.62), label,
 				HORIZONTAL_ALIGNMENT_CENTER, hex_size * 2.0, fs2, Color(col.lightened(0.4), 0.95))
 

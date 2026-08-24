@@ -39,7 +39,7 @@ func _make_theme() -> Theme:
 	])
 	var th := Theme.new()
 	th.default_font = f
-	th.default_font_size = 15
+	th.default_font_size = 18
 
 	var btn_normal := StyleBoxFlat.new()
 	btn_normal.bg_color = Color("#1f3540")
@@ -103,7 +103,7 @@ func _build_ui() -> void:
 	hbox.add_child(board_view)
 
 	var side := VBoxContainer.new()
-	side.custom_minimum_size = Vector2(470, 0)
+	side.custom_minimum_size = Vector2(510, 0)
 	side.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	side.add_theme_constant_override("separation", 8)
 	hbox.add_child(side)
@@ -115,7 +115,7 @@ func _build_ui() -> void:
 	head.add_child(head_v)
 	var title := Label.new()
 	title.text = "CELL WAR  细胞战争"
-	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_font_size_override("font_size", 24)
 	title.add_theme_color_override("font_color", Color("#8fd6e8"))
 	head_v.add_child(title)
 	top_label = Label.new()
@@ -125,7 +125,7 @@ func _build_ui() -> void:
 	event_label = Label.new()
 	event_label.text = ""
 	event_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	event_label.add_theme_font_size_override("font_size", 13)
+	event_label.add_theme_font_size_override("font_size", 15)
 	event_label.add_theme_color_override("font_color", Color("#ffd75e"))
 	head_v.add_child(event_label)
 
@@ -136,7 +136,7 @@ func _build_ui() -> void:
 	players_rtl.bbcode_enabled = true
 	players_rtl.fit_content = true
 	players_rtl.scroll_active = false
-	players_rtl.custom_minimum_size = Vector2(0, 120)
+	players_rtl.custom_minimum_size = Vector2(0, 140)
 	pp.add_child(players_rtl)
 
 	# 操作提示 + 按钮
@@ -151,7 +151,7 @@ func _build_ui() -> void:
 	prompt_label.add_theme_color_override("font_color", Color("#ffe9a8"))
 	op_v.add_child(prompt_label)
 	buttons_scroll = ScrollContainer.new()
-	buttons_scroll.custom_minimum_size = Vector2(0, 210)
+	buttons_scroll.custom_minimum_size = Vector2(0, 240)
 	buttons_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	op_v.add_child(buttons_scroll)
 	buttons_box = VBoxContainer.new()
@@ -167,7 +167,7 @@ func _build_ui() -> void:
 	log_rtl.bbcode_enabled = false
 	log_rtl.scroll_following = true
 	log_rtl.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_rtl.add_theme_font_size_override("normal_font_size", 13)
+	log_rtl.add_theme_font_size_override("normal_font_size", 15)
 	lp.add_child(log_rtl)
 
 	# 主菜单层
@@ -188,7 +188,7 @@ func _show_menu(result_text: String) -> void:
 		c.queue_free()
 	var t := Label.new()
 	t.text = "CELL WAR"
-	t.add_theme_font_size_override("font_size", 42)
+	t.add_theme_font_size_override("font_size", 48)
 	t.add_theme_color_override("font_color", Color("#8fd6e8"))
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	menu_vbox.add_child(t)
@@ -205,45 +205,76 @@ func _show_menu(result_text: String) -> void:
 		rl.add_theme_color_override("font_color", Color("#ffd75e"))
 		rl.add_theme_font_size_override("font_size", 18)
 		menu_vbox.add_child(rl)
-	var b4 := Button.new()
-	b4.text = "开始 4 人对局（免疫×2 vs 癌症×2）"
-	b4.pressed.connect(_start.bind(4, false))
-	menu_vbox.add_child(b4)
-	var b6 := Button.new()
-	b6.text = "开始 6 人对局（免疫×3 vs 癌症×3）"
-	b6.pressed.connect(_start.bind(6, false))
-	menu_vbox.add_child(b6)
-	var d4 := Button.new()
-	d4.text = "随机演示模式（4 人，AI 随机操作）"
-	d4.pressed.connect(_start.bind(4, true))
-	menu_vbox.add_child(d4)
-	var d6 := Button.new()
-	d6.text = "随机演示模式（6 人，AI 随机操作）"
-	d6.pressed.connect(_start.bind(6, true))
-	menu_vbox.add_child(d6)
+	_menu_section("人机对战（你控制整个阵营，AI 控制对方）")
+	_menu_row([
+		["执免疫 · 4 人局", _start.bind(4, "ai", CWData.FACTION_IMMUNE)],
+		["执癌症 · 4 人局", _start.bind(4, "ai", CWData.FACTION_CANCER)],
+	])
+	_menu_row([
+		["执免疫 · 6 人局", _start.bind(6, "ai", CWData.FACTION_IMMUNE)],
+		["执癌症 · 6 人局", _start.bind(6, "ai", CWData.FACTION_CANCER)],
+	])
+	_menu_section("本地对战（热座，所有玩家轮流操作本机）")
+	_menu_row([
+		["4 人局", _start.bind(4, "pvp", "")],
+		["6 人局", _start.bind(6, "pvp", "")],
+	])
+	_menu_section("观战演示（双方均由 AI 随机操作）")
+	_menu_row([
+		["演示 · 4 人局", _start.bind(4, "demo", "")],
+		["演示 · 6 人局", _start.bind(6, "demo", "")],
+	])
 	var hint := Label.new()
-	hint.text = "本地热座模式：所有玩家共用本机，按行动顺序轮流操作。\n黄色高亮 = 可点击的棋盘格/墙壁位置。"
+	hint.text = "黄色高亮 = 可点击的棋盘格 / 墙壁位置。窗口可任意拉大，界面会等比缩放。"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 12)
+	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color("#7d949e"))
 	menu_vbox.add_child(hint)
 	menu_layer.visible = true
 
 
+func _menu_section(text: String) -> void:
+	var lbl := Label.new()
+	lbl.text = text
+	lbl.add_theme_font_size_override("font_size", 14)
+	lbl.add_theme_color_override("font_color", Color("#9ab3bd"))
+	menu_vbox.add_child(lbl)
+
+
+func _menu_row(buttons: Array) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	menu_vbox.add_child(row)
+	for item in buttons:
+		var b := Button.new()
+		b.text = item[0]
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.pressed.connect(item[1])
+		row.add_child(b)
+
+
 # ==================== 开局 / 主循环 ====================
 
-func _start(n_players: int, demo: bool) -> void:
+func _start(n_players: int, mode: String, human_faction: String) -> void:
 	menu_layer.visible = false
 	log_rtl.clear()
 	pending_req = {}
-	if demo:
+	if mode == "demo":
 		bridge = DemoBridge.new()
 		bridge.tree = get_tree()
+	elif mode == "ai":
+		bridge = HybridBridge.new()
+		bridge.main = self
+		bridge.tree = get_tree()
+		bridge.human_faction = human_faction
 	else:
 		bridge = UIBridge.new()
 		bridge.main = self
 	bridge.log_added.connect(_on_log)
 	game = CWGame.new(bridge, n_players)
+	if bridge is HybridBridge:
+		bridge.game = game
+		log_rtl.add_text("人机对战：你执【%s】阵营，对方由 AI 操作。\n" % CWData.faction_cn(human_faction))
 	board_view.game = game
 	_run_async()
 
@@ -276,10 +307,17 @@ func _refresh() -> void:
 func _players_bb() -> String:
 	var bb := ""
 	var cur = game.cur_player()
+	var human_f := ""
+	var is_hybrid := bridge is HybridBridge
+	if is_hybrid:
+		human_f = bridge.human_faction
 	for p in game.players:
 		var c := "#4fc3f7" if p.is_immune() else "#ef5350"
 		var mark := "▶ " if (cur != null and cur == p) else "    "
-		bb += "[color=%s][b]%s%s[/b][/color]  " % [c, mark, p.pname]
+		var ctrl := ""
+		if is_hybrid:
+			ctrl = "·你" if p.faction == human_f else "·AI"
+		bb += "[color=%s][b]%s%s%s[/b][/color]  " % [c, mark, p.pname, ctrl]
 		if p.alive:
 			bb += "生物质 [b]%d[/b]/5" % p.biomass
 			if p.is_cancer() and p.walls_stock > 0:
@@ -353,17 +391,17 @@ func _clear_buttons() -> void:
 
 
 func _on_option_pressed(value) -> void:
-	if bridge is UIBridge:
+	if bridge != null and bridge.has_method("answer"):
 		bridge.answer(value)
 
 
 func _on_board_hex(h: Vector2i) -> void:
-	if pending_req.get("type", "") == "pick_hex" and bridge is UIBridge:
+	if pending_req.get("type", "") == "pick_hex" and bridge != null and bridge.has_method("answer"):
 		bridge.answer(h)
 
 
 func _on_board_edge(k: String) -> void:
-	if pending_req.get("type", "") == "pick_edge" and bridge is UIBridge:
+	if pending_req.get("type", "") == "pick_edge" and bridge != null and bridge.has_method("answer"):
 		bridge.answer(k)
 
 

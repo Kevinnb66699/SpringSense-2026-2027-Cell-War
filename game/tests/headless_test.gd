@@ -21,6 +21,9 @@ func _init() -> void:
 	for i in range(seeds.size()):
 		var n := 4 if i % 2 == 0 else 6
 		await _run_full_game(n, seeds[i])
+	# 人机桥（全 AI 模式）：验证启发式策略的所有代码路径
+	await _run_hybrid_game(4, 55)
+	await _run_hybrid_game(6, 66)
 	if failures == 0:
 		print("=== ALL TESTS PASSED ===")
 	else:
@@ -86,6 +89,24 @@ func _test_hexlib() -> void:
 		for nb in HexLib.neighbors(h):
 			check(not CWData.OFFICIAL_LAYOUT.has(nb), "官方癌组织与特殊事件相邻: %s" % str(h))
 	print("HexLib / 数据表检查完成")
+
+
+func _run_hybrid_game(n_players: int, seed_value: int) -> void:
+	var bridge := HybridBridge.new(seed_value)
+	bridge.tree = null
+	bridge.human_faction = ""  # 双方均由启发式 AI 操作
+	var game := CWGame.new(bridge, n_players, seed_value)
+	bridge.game = game
+	await game.run_setup()
+	await game.run_game()
+	check(game.game_over, "AI 对局应已结束")
+	check(game.winner != "", "AI 对局应有获胜阵营")
+	for p in game.players:
+		check(p.biomass >= 0 and p.biomass <= CWData.MAX_BIOMASS,
+			"AI 对局 %s 生物质越界: %d" % [p.pname, p.biomass])
+		check(HexLib.in_board(p.pos), "AI 对局 %s 位置在棋盘外" % p.pname)
+	print("AI 策略对局测试通过：%d 人局 seed=%d，%s 获胜（%s）" %
+		[n_players, seed_value, CWData.faction_cn(game.winner), game.win_reason])
 
 
 func _run_full_game(n_players: int, seed_value: int) -> void:

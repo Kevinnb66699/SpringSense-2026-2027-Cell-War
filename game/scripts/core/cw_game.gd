@@ -98,11 +98,14 @@ func ask_option(who: String, prompt: String, labels: Array, values: Array, cance
 	})
 
 
-func ask_hex(who: String, prompt: String, options: Array, cancel: String = ""):
-	return await bridge.ask({
+func ask_hex(who: String, prompt: String, options: Array, cancel: String = "", extra: Dictionary = {}):
+	var req := {
 		"type": "pick_hex", "who": who, "prompt": prompt,
 		"options": options, "cancel": cancel,
-	})
+	}
+	for k in extra:
+		req[k] = extra[k]
+	return await bridge.ask(req)
 
 
 func ask_edge(who: String, prompt: String, options: Array, cancel: String = ""):
@@ -247,7 +250,7 @@ func _setup_positions() -> void:
 				if board.tissue_at(h) == CWData.Tissue.NORMAL:
 					valid.append(h)
 		var tip := "癌组织" if p.is_cancer() else "正常组织"
-		var pick = await ask_hex(p.pname, "%s 选择初始位置（%s）" % [p.pname, tip], valid)
+		var pick = await ask_hex(p.pname, "%s 选择初始位置（%s）" % [p.pname, tip], valid, "", {"tag": "setup_pos"})
 		if pick == null:
 			pick = valid[0]
 		p.pos = pick
@@ -875,7 +878,8 @@ func _pre_move_step(p) -> void:
 	if legal.is_empty():
 		return
 	var aname := "Chemotaxis" if p.is_immune() else "Metastasis"
-	var t = await ask_hex(p.pname, "%s：能力【%s】可在移动阶段前移动 1 步（可跳过）" % [p.pname, aname], legal, "跳过")
+	var t = await ask_hex(p.pname, "%s：能力【%s】可在移动阶段前移动 1 步（可跳过）" % [p.pname, aname], legal, "跳过",
+		{"tag": "move_step", "actor": p})
 	if t == null:
 		return
 	_do_step(p, t)
@@ -918,7 +922,8 @@ func _interactive_move(p, steps: int) -> void:
 		if legal.is_empty():
 			log_line("%s 无路可走，移动结束。" % p.pname)
 			return
-		var t = await ask_hex(p.pname, "%s：选择移动方向（剩余 %d 步）" % [p.pname, remaining], legal, "结束移动")
+		var t = await ask_hex(p.pname, "%s：选择移动方向（剩余 %d 步）" % [p.pname, remaining], legal, "结束移动",
+			{"tag": "move_step", "actor": p})
 		if t == null:
 			return
 		_do_step(p, t)
@@ -948,7 +953,7 @@ func _attack_check(p) -> void:
 		var opts: Array = []
 		for c in targets:
 			opts.append(c.pos)
-		var pos_pick = await ask_hex(p.pname, "%s：选择攻击目标" % p.pname, opts)
+		var pos_pick = await ask_hex(p.pname, "%s：选择攻击目标" % p.pname, opts, "", {"tag": "attack_target", "actor": p})
 		if pos_pick != null:
 			for c in targets:
 				if c.pos == pos_pick:
