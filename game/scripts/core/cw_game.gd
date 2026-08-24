@@ -86,6 +86,7 @@ func touch() -> void:
 
 func d6(reason: String = "") -> int:
 	var v := rng.randi_range(1, 6)
+	await bridge.show_roll(reason, v)
 	if reason != "":
 		log_line("🎲 %s：掷出 %d" % [reason, v])
 	return v
@@ -743,7 +744,7 @@ func _pool_draw_judgment(p) -> void:
 			var best := 0
 			var rolls: Dictionary = {}
 			for q in contenders:
-				var v := d6("%s 争夺卡池" % q.pname)
+				var v: int = await d6("%s 争夺卡池" % q.pname)
 				rolls[q] = v
 				if v > best:
 					best = v
@@ -798,7 +799,7 @@ func _free_draw_phase(p) -> void:
 			await draw_card(p)
 		elif pick == "mutate":
 			p.lose_biomass(1)
-			var v := d6("%s 突变抽卡" % p.pname)
+			var v: int = await d6("%s 突变抽卡" % p.pname)
 			if v >= 4:
 				await draw_card(p)
 			else:
@@ -849,7 +850,7 @@ func _move_phase(p) -> void:
 	var pick = await ask_option(p.pname, "%s：移动阶段" % p.pname,
 		["掷骰移动", "跳过移动"], ["roll", "skip"])
 	if pick == "roll":
-		var v := d6("%s 移动" % p.pname)
+		var v: int = await d6("%s 移动" % p.pname)
 		var steps := _die_steps(v) + _move_bonus(p)
 		log_line("%s 可移动 %d 步。" % [p.pname, steps])
 		await _interactive_move(p, steps)
@@ -862,7 +863,7 @@ func _move_phase(p) -> void:
 			["掷骰移动", "放弃"], [true, false])
 		if use != true:
 			break
-		var v2 := d6("%s 额外移动" % p.pname)
+		var v2: int = await d6("%s 额外移动" % p.pname)
 		var steps2 := _die_steps(v2) + _move_bonus(p)
 		log_line("%s 可移动 %d 步。" % [p.pname, steps2])
 		await _interactive_move(p, steps2)
@@ -993,7 +994,7 @@ func _perform_attack(atk, tgt, dir: int, is_double: bool) -> void:
 		tier = 2
 		log_line("💥 攻击必然大成功！")
 	else:
-		var v := d6("%s 攻击判定" % atk.pname)
+		var v: int = await d6("%s 攻击判定" % atk.pname)
 		if v <= 1:
 			tier = 0
 		elif v <= 3:

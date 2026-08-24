@@ -4,7 +4,6 @@ extends CWBridge
 ## 决策归属通过请求的 who 字段判断（"免疫×" / "癌×"，词表由 cw_game 控制）。
 ## human_faction 为空字符串时双方都由 AI 操作（用于测试）。
 
-var main = null                  # Main 节点（人类决策 UI）
 var game = null                  # CWGame（_start 后由 main 赋值，AI 决策需要读取局面）
 var tree: SceneTree = null
 var human_faction := ""          # CWData.FACTION_IMMUNE / FACTION_CANCER / ""(全AI)

@@ -21,6 +21,9 @@ extends RefCounted
 signal state_changed
 signal log_added(text: String)
 
+## UI 主控制器（Main 节点）。无头运行时为 null，掷骰展示等 UI 反馈自动跳过。
+var main = null
+
 
 func ask(req: Dictionary):
 	var t: String = req.get("type", "")
@@ -40,6 +43,12 @@ func ask(req: Dictionary):
 			return null
 		return options[0]
 	return null
+
+
+## 展示一次掷骰（引擎在写日志前 await 此方法；UI 播放动画，无头时立即返回）
+func show_roll(reason: String, value: int) -> void:
+	if main != null:
+		await main.play_dice(reason, value, false)
 
 
 func log_line(text: String) -> void:

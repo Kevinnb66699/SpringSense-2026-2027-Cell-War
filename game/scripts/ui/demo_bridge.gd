@@ -14,6 +14,12 @@ func _init(seed_value: int = 0) -> void:
 		rng.seed = seed_value
 
 
+## 演示模式统一用加速掷骰动画
+func show_roll(reason: String, value: int) -> void:
+	if main != null:
+		await main.play_dice(reason, value, true)
+
+
 func ask(req: Dictionary):
 	if tree != null and delay > 0.0:
 		await tree.create_timer(delay).timeout

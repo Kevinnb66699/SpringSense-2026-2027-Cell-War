@@ -15,6 +15,7 @@ var buttons_scroll: ScrollContainer
 var log_rtl: RichTextLabel
 var menu_layer: CenterContainer
 var menu_vbox: VBoxContainer
+var dice_overlay: DiceOverlay
 
 
 func _ready() -> void:
@@ -101,6 +102,14 @@ func _build_ui() -> void:
 	board_view.hex_clicked.connect(_on_board_hex)
 	board_view.edge_clicked.connect(_on_board_edge)
 	hbox.add_child(board_view)
+
+	# 掷骰动画浮层（居中于棋盘上方，不拦截鼠标）
+	var dice_center := CenterContainer.new()
+	dice_center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dice_center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	board_view.add_child(dice_center)
+	dice_overlay = DiceOverlay.new()
+	dice_center.add_child(dice_overlay)
 
 	var side := VBoxContainer.new()
 	side.custom_minimum_size = Vector2(510, 0)
@@ -262,6 +271,7 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 	if mode == "demo":
 		bridge = DemoBridge.new()
 		bridge.tree = get_tree()
+		bridge.main = self
 	elif mode == "ai":
 		bridge = HybridBridge.new()
 		bridge.main = self
@@ -340,6 +350,11 @@ func _players_bb() -> String:
 
 
 # ==================== 问答桥回调 ====================
+
+## 播放掷骰动画（引擎经桥调用；动画播完才返回，保证流程与画面同步）
+func play_dice(reason: String, value: int, fast: bool) -> void:
+	await dice_overlay.play(reason, value, fast)
+
 
 func show_request(req: Dictionary) -> void:
 	pending_req = req
