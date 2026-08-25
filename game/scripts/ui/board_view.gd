@@ -10,6 +10,11 @@ var game = null          # CWGame
 var hex_size := 40.0
 var origin := Vector2.ZERO
 
+# ---- 鼠标镜头偏移（camera peek）：鼠标偏向哪边，镜头就往那边轻移 ----
+const PEEK_MAX := 18.0    # 最大平移距离（设计分辨率像素），调手感改这里
+const PEEK_SPEED := 8.0   # 跟随/回中的平滑速度，越大越跟手
+var _peek := Vector2.ZERO
+
 # 选择状态
 var pick_mode := ""              # "" / "hex" / "edge"
 var hex_options: Array = []      # Vector2i
@@ -41,6 +46,20 @@ var _cells: Array[Vector2i] = []
 func _ready() -> void:
 	_cells = HexLib.all_cells()
 	mouse_filter = Control.MOUSE_FILTER_STOP
+
+
+func _process(delta: float) -> void:
+	if game == null:
+		return
+	if size.x <= 0.0 or size.y <= 0.0:
+		return
+	# 鼠标相对棋盘中心的归一化偏移 [-1, 1]；镜头向鼠标方向移 = 画面内容反向移
+	var n := ((get_local_mouse_position() - size / 2.0) / (size / 2.0)).clamp(Vector2(-1, -1), Vector2(1, 1))
+	var target := -n * PEEK_MAX
+	var next := _peek.lerp(target, minf(1.0, delta * PEEK_SPEED))
+	if next.distance_to(_peek) > 0.05:
+		_peek = next
+		queue_redraw()
 
 
 func set_pick_hex(options: Array) -> void:
@@ -110,7 +129,7 @@ func _draw() -> void:
 	if game == null:
 		return
 	hex_size = minf(size.x / 16.8, size.y / 15.2)
-	origin = size / 2.0
+	origin = size / 2.0 + _peek
 	var font := get_theme_default_font()
 
 	# ---- 组织 ----
