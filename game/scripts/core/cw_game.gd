@@ -260,6 +260,33 @@ func run_game() -> void:
 	_final_scoring()
 
 
+## 从当前回合的某名玩家继续跑（CWSnapshot.restore 之后调用，蒙特卡洛推演/断线恢复用）。
+## 快照取在回合起点，因此本世界回合的 round_start 已发生，不重复执行。
+## max_rounds > 0 为推演视界：最多再跑这么多个世界回合就返回（不做终局计分，由调用方评分）。
+func resume_game(first_player_idx: int, max_rounds: int = 0) -> void:
+	var horizon := round_num + max_rounds if max_rounds > 0 else CWData.TOTAL_ROUNDS
+	for i in range(first_player_idx, players.size()):
+		cur_player_idx = i
+		await turn.run(players[i])
+		if game_over:
+			return
+	cur_player_idx = -1
+	for r in range(round_num + 1, CWData.TOTAL_ROUNDS + 1):
+		if r > horizon:
+			return
+		round_num = r
+		await world.round_start()
+		if game_over:
+			return
+		for i in range(players.size()):
+			cur_player_idx = i
+			await turn.run(players[i])
+			if game_over:
+				return
+		cur_player_idx = -1
+	_final_scoring()
+
+
 # ==================== 胜负判定 ====================
 
 func check_immediate_win() -> void:

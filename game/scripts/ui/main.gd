@@ -47,6 +47,13 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 		bridge.main = self
 		bridge.tree = get_tree()
 		bridge.human_faction = human_faction
+	elif mode == "mc" or mode == "mc_watch":
+		# 蒙特卡洛搜索桥：免疫由推演搜索操控（mc 模式人执癌症；mc_watch 双方全 AI 观战）
+		bridge = MCBridge.new()
+		bridge.main = self
+		bridge.tree = get_tree()
+		bridge.human_faction = human_faction
+		bridge.mc_faction = CWData.FACTION_IMMUNE
 	else:
 		bridge = UIBridge.new()
 		bridge.main = self
@@ -54,7 +61,13 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 	if game != null and game.game_over:
 		game.dispose()
 	game = CWGame.new(bridge, n_players)
-	if bridge is HybridBridge:
+	if bridge is MCBridge:
+		bridge.game = game
+		if human_faction != "":
+			side_panel.add_log("蒙特卡洛对战：你执【%s】，免疫阵营由 MC 推演搜索操控。" % CWData.faction_cn(human_faction))
+		else:
+			side_panel.add_log("蒙特卡洛观战：免疫=MC 推演搜索，癌症=启发式 AI。")
+	elif bridge is HybridBridge:
 		bridge.game = game
 		side_panel.add_log("人机对战：你执【%s】阵营，对方由 AI 操作。" % CWData.faction_cn(human_faction))
 	board_view.game = game

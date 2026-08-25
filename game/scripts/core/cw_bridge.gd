@@ -86,3 +86,9 @@ func log_line(text: String) -> void:
 
 func notify_changed() -> void:
 	state_changed.emit()
+
+
+## 回合起点通知：每名玩家回合开始时（cw_turn.run 第一行）由引擎调用。
+## MC 搜索桥在此取局面快照；将来联机桥可在此比对 state_hash 检测失步。基类无动作。
+func on_turn_start(_game) -> void:
+	pass

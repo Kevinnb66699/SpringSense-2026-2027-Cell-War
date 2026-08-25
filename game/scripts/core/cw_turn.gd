@@ -16,6 +16,7 @@ func _init(p_game: CWGame) -> void:
 ## 休养生息与生物质工厂在行动之后结算。
 ## skip_this_round（复活休整，由世界回合开始时清除）与 stunned（眩晕，消耗即清）是两种不同的跳过。
 func run(p) -> void:
+	game.bridge.on_turn_start(game)
 	p.reset_turn_flags()
 	game.extra_moves = 0
 	game.log_line("")

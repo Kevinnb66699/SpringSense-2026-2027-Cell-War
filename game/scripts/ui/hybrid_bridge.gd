@@ -39,6 +39,11 @@ func answer(v) -> void:
 	answered.emit(v)
 
 
+## 策略入口（同步、无延迟）：MC 搜索桥的推演回放复用启发式策略时调用
+func ai_decide(req: Dictionary):
+	return _ai_decide(req)
+
+
 func _is_human(req: Dictionary) -> bool:
 	var f: String = req.get("owner_faction", "")
 	if f == "":

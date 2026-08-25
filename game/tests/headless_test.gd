@@ -26,6 +26,9 @@ func _init() -> void:
 	await _run_hybrid_game(6, 66)
 	# 联机锁步的根基：引擎确定性 + 答案线格式
 	await _test_determinism()
+	# 蒙特卡洛 AI 的根基：快照/回放等价性 + 搜索桥冒烟
+	await _test_snapshot()
+	await _test_mc_game()
 	if failures == 0:
 		print("=== ALL TESTS PASSED ===")
 	else:
@@ -52,7 +55,8 @@ func _test_all_scripts_compile() -> void:
 					to_scan.append(full)
 			elif fname.ends_with(".gd"):
 				var res = load(full)
-				check(res != null, "脚本解析失败: " + full)
+				# load() 对编译失败的脚本也返回非空资源，必须再看 can_instantiate
+				check(res != null and res.can_instantiate(), "脚本编译失败: " + full)
 				n_checked += 1
 			fname = dir.get_next()
 		dir.list_dir_end()
@@ -189,3 +193,72 @@ func _hash_of_game(n_players: int, seed_value: int, use_codec: bool):
 		check(bridge.codec_failures == 0, "线格式编解码往返损坏 %d 次" % bridge.codec_failures)
 	game.dispose()
 	return h
+
+
+## 对局中段拍快照并记录其后全部答案（线格式）——快照等价性测试的采集端
+class SnapBridge extends DemoBridge:
+	var snap = null
+	var wire_log: Array = []
+	var turn_count := 0
+	var snap_at := 10   # 在第 10 次回合起点拍快照（4 人局 ≈ 第 3 世界回合中段）
+
+	func on_turn_start(g) -> void:
+		turn_count += 1
+		if turn_count == snap_at:
+			snap = CWSnapshot.capture(g)
+			wire_log = []
+
+	func ask(req: Dictionary):
+		var v = await super.ask(req)
+		if snap != null:
+			wire_log.append(CWBridge.encode_answer(req, v))
+		return v
+
+
+## 快照/回放等价性：用中段快照还原 + 回放答案跑完剩余对局，
+## 终局 state_hash 必须与原局逐位一致。这是 MC 推演克隆与将来断线恢复的根基。
+func _test_snapshot() -> void:
+	var bridge := SnapBridge.new(77)
+	bridge.tree = null
+	var game := CWGame.new(bridge, 4, 77)
+	await game.run_setup()
+	await game.run_game()
+	check(game.game_over, "快照测试原局未结束")
+	check(bridge.snap != null, "对局过短，未到达快照点")
+	var h_orig: int = game.state_hash()
+	var winner_orig: String = game.winner
+	game.dispose()
+	var rb := MCBridge.ReplayBridge.new()
+	rb.queue = bridge.wire_log.duplicate()
+	# 不设 policy、不重播种：确定性保证答案序列刚好够用，多一个少一个都是 bug
+	var clone = CWSnapshot.restore(bridge.snap, rb)
+	rb.game = clone
+	await clone.resume_game(clone.cur_player_idx)
+	check(clone.game_over, "快照回放局未结束")
+	check(rb.queue.is_empty(), "快照回放答案未耗尽（剩 %d 个，回放提前分叉）" % rb.queue.size())
+	check(clone.state_hash() == h_orig, "快照回放终局与原局不一致（快照漏字段或回放机制有误）")
+	check(clone.winner == winner_orig, "快照回放胜方与原局不同")
+	clone.dispose()
+	rb.game = null
+	print("快照/回放等价性检查完成（回放 %d 个答案，终局哈希一致）" % bridge.wire_log.size())
+
+
+## MC 搜索桥冒烟：小参数跑完一整局（癌症用 MC 推演，免疫用启发式），验证推演机制稳定
+func _test_mc_game() -> void:
+	var t0 := Time.get_ticks_msec()
+	var bridge := MCBridge.new(88)
+	bridge.tree = null
+	bridge.human_faction = ""
+	bridge.mc_faction = CWData.FACTION_CANCER
+	bridge.playouts = 1
+	bridge.horizon = 1
+	bridge.max_candidates = 3
+	var game := CWGame.new(bridge, 4, 88)
+	bridge.game = game
+	await game.run_setup()
+	await game.run_game()
+	check(game.game_over, "MC 对局未结束")
+	check(game.winner != "", "MC 对局应有获胜阵营")
+	print("MC 搜索桥冒烟通过：4 人局 seed=88，%s 获胜，用时 %d ms" %
+		[CWData.faction_cn(game.winner), Time.get_ticks_msec() - t0])
+	game.dispose()
