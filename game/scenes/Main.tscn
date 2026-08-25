@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main.gd" id="1_main"]
+[ext_resource type="Theme" path="res://scenes/ui_theme.tres" id="2_theme"]
+[ext_resource type="Script" path="res://scripts/ui/board_view.gd" id="3_board"]
+[ext_resource type="Script" path="res://scripts/ui/dice_overlay.gd" id="4_dice"]
+[ext_resource type="PackedScene" path="res://scenes/SidePanel.tscn" id="5_side"]
+[ext_resource type="PackedScene" path="res://scenes/MenuScreen.tscn" id="6_menu"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -9,4 +14,65 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("2_theme")
 script = ExtResource("1_main")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0392157, 0.0666667, 0.0784314, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBox" type="HBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BoardView" type="Control" parent="Margin/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.6
+script = ExtResource("3_board")
+
+[node name="DiceCenter" type="CenterContainer" parent="Margin/HBox/BoardView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DiceOverlay" type="Control" parent="Margin/HBox/BoardView/DiceCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("4_dice")
+
+[node name="SidePanel" parent="Margin/HBox" instance=ExtResource("5_side")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MenuScreen" parent="." instance=ExtResource("6_menu")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

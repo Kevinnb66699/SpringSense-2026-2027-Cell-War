@@ -43,5 +43,6 @@
 
 - 引擎：Godot 4.5 stable，语言：GDScript。
 - **参与开发（人或 AI）请先读 `docs/架构说明书.md`**；用 AI 协作时，根目录 `CLAUDE.md` / `AGENTS.md` 会自动约束 AI 遵循本项目架构。
-- `game/scripts/core/` 为纯规则逻辑（不依赖场景节点，便于测试与将来联机复用）；`game/scripts/ui/` 为界面层。
+- `game/scripts/core/` 为纯规则逻辑（不依赖场景节点，便于测试与将来联机复用）；`game/scripts/ui/` 为界面层逻辑。
+- 界面静态布局与主题在 `game/scenes/`（`Main.tscn` / `SidePanel.tscn` / `MenuScreen.tscn` / `ui_theme.tres`），可在 Godot 编辑器里可视化调整，无需改代码。
 - 规则引擎按功能拆分模块：`cw_game.gd` 持有状态与总调度，具体流程分别在 `cw_setup / cw_world / cw_events / cw_turn / cw_movement / cw_combat / cw_cards`，改哪个功能就改对应文件。

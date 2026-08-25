@@ -1,0 +1,131 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/menu_screen.gd" id="1_menu"]
+
+[node name="MenuScreen" type="CenterContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="MenuPanel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+
+[node name="MenuVBox" type="VBoxContainer" parent="MenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BigTitle" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.560784, 0.839216, 0.909804, 1)
+theme_override_font_sizes/font_size = 48
+text = "CELL WAR"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.701961, 0.741176, 1)
+text = "细胞战争 · 桌游电子版 ver 0.98"
+horizontal_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="MenuPanel/MenuVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0.368627, 1)
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SectionAI" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.701961, 0.741176, 1)
+theme_override_font_sizes/font_size = 14
+text = "人机对战（你控制整个阵营，AI 控制对方）"
+
+[node name="RowAi4" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnAiImmune4" type="Button" parent="MenuPanel/MenuVBox/RowAi4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执免疫 · 4 人局"
+
+[node name="BtnAiCancer4" type="Button" parent="MenuPanel/MenuVBox/RowAi4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执癌症 · 4 人局"
+
+[node name="RowAi6" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnAiImmune6" type="Button" parent="MenuPanel/MenuVBox/RowAi6"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执免疫 · 6 人局"
+
+[node name="BtnAiCancer6" type="Button" parent="MenuPanel/MenuVBox/RowAi6"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执癌症 · 6 人局"
+
+[node name="SectionPvp" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.701961, 0.741176, 1)
+theme_override_font_sizes/font_size = 14
+text = "本地对战（热座，所有玩家轮流操作本机）"
+
+[node name="RowPvp" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnPvp4" type="Button" parent="MenuPanel/MenuVBox/RowPvp"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "4 人局"
+
+[node name="BtnPvp6" type="Button" parent="MenuPanel/MenuVBox/RowPvp"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "6 人局"
+
+[node name="SectionDemo" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.701961, 0.741176, 1)
+theme_override_font_sizes/font_size = 14
+text = "观战演示（双方均由 AI 随机操作）"
+
+[node name="RowDemo" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnDemo4" type="Button" parent="MenuPanel/MenuVBox/RowDemo"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "演示 · 4 人局"
+
+[node name="BtnDemo6" type="Button" parent="MenuPanel/MenuVBox/RowDemo"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "演示 · 6 人局"
+
+[node name="Hint" type="Label" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.490196, 0.580392, 0.619608, 1)
+theme_override_font_sizes/font_size = 14
+text = "黄色高亮 = 可点击的棋盘格 / 墙壁位置。窗口可任意拉大，界面会等比缩放。"
+autowrap_mode = 3

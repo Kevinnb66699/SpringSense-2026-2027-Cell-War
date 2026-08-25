@@ -1,0 +1,80 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/side_panel.gd" id="1_side"]
+
+[node name="SidePanel" type="VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(510, 0)
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+script = ExtResource("1_side")
+
+[node name="Head" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="HeadV" type="VBoxContainer" parent="Head"]
+layout_mode = 2
+
+[node name="GameTitle" type="Label" parent="Head/HeadV"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.560784, 0.839216, 0.909804, 1)
+theme_override_font_sizes/font_size = 24
+text = "CELL WAR  细胞战争"
+
+[node name="TopLabel" type="Label" parent="Head/HeadV"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="EventLabel" type="Label" parent="Head/HeadV"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0.368627, 1)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+
+[node name="PlayersPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="PlayersRTL" type="RichTextLabel" parent="PlayersPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="OpPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="OpV" type="VBoxContainer" parent="OpPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PromptLabel" type="Label" parent="OpPanel/OpV"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.913725, 0.658824, 1)
+autowrap_mode = 3
+
+[node name="ButtonsScroll" type="ScrollContainer" parent="OpPanel/OpV"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ButtonsBox" type="VBoxContainer" parent="OpPanel/OpV/ButtonsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="LogPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogRTL" type="RichTextLabel" parent="LogPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 15
+scroll_following = true

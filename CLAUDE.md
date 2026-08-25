@@ -15,7 +15,9 @@
 2. 一切玩家决策走 `game.ask_option / ask_hex / ask_edge`（问答桥），who 传玩家对象或 `CWData.FACTION_*`
 3. 一切游戏随机走 `game.rng`；禁用 `randi()/randf()/randomize()/Time.*/OS.*`（确定性测试会抓）
 4. 改哪个功能去哪个文件：数值/文案→`cw_data.gd`；卡牌效果→`cw_cards.gd`；事件→`cw_events.gd`；
-   战斗→`cw_combat.gd`；移动→`cw_movement.gd`；回合→`cw_turn.gd`；AI→`hybrid_bridge.gd`；界面→`scripts/ui/`
+   战斗→`cw_combat.gd`；移动→`cw_movement.gd`；回合→`cw_turn.gd`；AI→`hybrid_bridge.gd`；
+   界面布局/样式→`scenes/*.tscn` + `scenes/ui_theme.tres`（编辑器可视化改；改节点名先搜脚本 `%节点名`）；
+   界面逻辑→`scripts/ui/`
 5. 选项 value 字符串（"burn"/"roll"/"solidify"…）、卡牌/事件/进化 id、req 的 tag 是**语义键**，
    启发式 AI 靠它们决策——不要改名；部分 prompt 关键词也被 AI 依赖，改文案先搜 `hybrid_bridge.gd`
 6. 新增影响规则的状态：加进 `CWGame.state_hash()`；丢弃已结束对局前调 `game.dispose()`
