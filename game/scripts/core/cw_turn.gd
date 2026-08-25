@@ -11,6 +11,10 @@ func _init(p_game: CWGame) -> void:
 	game = p_game
 
 
+## 跑完一名玩家的完整回合。时序对应手册"玩家回合流程"，顺序不可调换：
+## 三个判定（复活/血管+卡池/墙壁工厂）都发生在三个行动（抽卡/移动/特殊）之前，
+## 休养生息与生物质工厂在行动之后结算。
+## skip_this_round（复活休整，由世界回合开始时清除）与 stunned（眩晕，消耗即清）是两种不同的跳过。
 func run(p) -> void:
 	p.reset_turn_flags()
 	game.extra_moves = 0
@@ -93,6 +97,9 @@ func run(p) -> void:
 	game.touch()
 
 
+## 判定 1：死亡癌细胞的复活。免疫细胞死亡不可复活（手册规则，直接返回）。
+## 两种途径：固化癌组织上复活（组织变回普通癌组织）；干细胞进化则可消耗队友
+## 1 点生物质在任意癌组织复活。复活成功的当回合即可行动。
 func _try_revive(p) -> void:
 	if p.is_immune():
 		return
@@ -169,6 +176,8 @@ func offer_evo_swap(p) -> void:
 		game.log_line("🧬 %s 更换进化能力为【%s】。" % [p.pname, CWData.evo_def(p.faction, pick)["name"]])
 
 
+## 判定 2：站上激活卡池后的抽卡资格。异阵营同格时掷骰竞争（并列最高者之间
+## 重掷直到分出唯一胜者）；同阵营多人则协商指定一人。抽完该卡池变为未激活。
 func _pool_draw_judgment(p) -> void:
 	var here := game.players_at(p.pos)
 	var enemies: Array = []
@@ -211,6 +220,9 @@ func _pool_draw_judgment(p) -> void:
 	game.touch()
 
 
+## 行动 1：自由抽卡，可反复进行直到生物质不足或玩家主动结束。
+## 燃烧抽卡：-2 生物质必得一张；突变抽卡（癌症专属）：-1 生物质，掷骰 4-6 才抽。
+## 生物质门槛比消耗高 1（3/2），保证抽卡后不会归零暴毙。
 func _free_draw_phase(p) -> void:
 	game.phase_text = "回合 %d/%d · %s · 抽卡阶段" % [game.round_num, CWData.TOTAL_ROUNDS, p.pname]
 	game.touch()
@@ -244,6 +256,9 @@ func _free_draw_phase(p) -> void:
 		game.touch()
 
 
+## 行动 3：特殊行动，每回合限选一种。免疫=净化/拆墙（连通墙一并拆除），
+## 癌症=感染/固化（计数 3 次成固化癌组织）/建墙（一次行动可连造多面直到取消或用完）。
+## 转移癌（evo=="meta"）没有特殊行动，已在 run() 里排除。
 func _special_phase(p) -> void:
 	game.phase_text = "回合 %d/%d · %s · 特殊行动" % [game.round_num, CWData.TOTAL_ROUNDS, p.pname]
 	game.touch()
