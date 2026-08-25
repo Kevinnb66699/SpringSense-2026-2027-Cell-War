@@ -43,13 +43,13 @@ func move_phase(p) -> void:
 		await interactive_move(p, 1)
 		while game.extra_moves > 0 and p.alive and not game.game_over:
 			game.extra_moves -= 1
-			var use = await game.ask_option(p.pname, "使用额外移动机会？（转移癌固定 1 步）",
+			var use = await game.ask_option(p, "使用额外移动机会？（转移癌固定 1 步）",
 				["移动 1 步", "放弃"], [true, false])
 			if use != true:
 				break
 			await interactive_move(p, 1)
 		return
-	var pick = await game.ask_option(p.pname, "%s：移动阶段" % p.pname,
+	var pick = await game.ask_option(p, "%s：移动阶段" % p.pname,
 		["掷骰移动", "跳过移动"], ["roll", "skip"])
 	if pick == "roll":
 		var v: int = await game.d6("%s 移动" % p.pname)
@@ -61,7 +61,7 @@ func move_phase(p) -> void:
 	# 额外移动机会
 	while game.extra_moves > 0 and p.alive and not game.game_over:
 		game.extra_moves -= 1
-		var use = await game.ask_option(p.pname, "%s：使用额外移动机会？（重新掷骰移动）" % p.pname,
+		var use = await game.ask_option(p, "%s：使用额外移动机会？（重新掷骰移动）" % p.pname,
 			["掷骰移动", "放弃"], [true, false])
 		if use != true:
 			break
@@ -81,7 +81,7 @@ func _pre_move_step(p) -> void:
 	if legal.is_empty():
 		return
 	var aname := "Chemotaxis" if p.is_immune() else "Metastasis"
-	var t = await game.ask_hex(p.pname, "%s：能力【%s】可在移动阶段前移动 1 步（可跳过）" % [p.pname, aname], legal, "跳过",
+	var t = await game.ask_hex(p, "%s：能力【%s】可在移动阶段前移动 1 步（可跳过）" % [p.pname, aname], legal, "跳过",
 		{"tag": "move_step", "actor": p})
 	if t == null:
 		return
@@ -126,7 +126,7 @@ func interactive_move(p, steps: int) -> void:
 		if legal.is_empty():
 			game.log_line("%s 无路可走，移动结束。" % p.pname)
 			return
-		var t = await game.ask_hex(p.pname, "%s：选择移动方向（剩余 %d 步）" % [p.pname, remaining], legal, "结束移动",
+		var t = await game.ask_hex(p, "%s：选择移动方向（剩余 %d 步）" % [p.pname, remaining], legal, "结束移动",
 			{"tag": "move_step", "actor": p})
 		if t == null:
 			return

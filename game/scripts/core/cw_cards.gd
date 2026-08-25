@@ -62,7 +62,7 @@ func _apply_card(p, cid: String) -> void:
 						opts.append(h)
 			if opts.is_empty():
 				return
-			var t = await game.ask_hex(p.pname, "Teleporting：选择传送目的地（己方阵营组织）", opts)
+			var t = await game.ask_hex(p, "Teleporting：选择传送目的地（己方阵营组织）", opts)
 			if t != null:
 				p.pos = t
 				game.log_line("🌀 %s 传送完成。" % p.pname)
@@ -76,7 +76,7 @@ func _apply_card(p, cid: String) -> void:
 			if mates.is_empty():
 				game.log_line("没有存活的队友，卡牌无效。")
 				return
-			var mate = await game.ask_option(p.pname, "Translocation：选择交换位置的队友", labels, mates)
+			var mate = await game.ask_option(p, "Translocation：选择交换位置的队友", labels, mates)
 			if mate == null:
 				mate = mates[0]
 			var tmp: Vector2i = p.pos
@@ -100,7 +100,7 @@ func _apply_card(p, cid: String) -> void:
 			if targets.is_empty():
 				game.log_line("棋盘上没有普通癌组织，卡牌无效。")
 				return
-			var t = await game.ask_hex(p.pname, "Good day：选择一块普通癌组织转变为正常组织", targets)
+			var t = await game.ask_hex(p, "Good day：选择一块普通癌组织转变为正常组织", targets)
 			if t != null:
 				game.board.purify(t)
 				game.log_line("☀️ 一块癌组织被转变为正常组织。")
@@ -108,7 +108,7 @@ func _apply_card(p, cid: String) -> void:
 			var targets := game.board.tissues_of_type(CWData.Tissue.NORMAL)
 			if targets.is_empty():
 				return
-			var t = await game.ask_hex(p.pname, "Bad day：选择一块正常组织转变为普通癌组织", targets)
+			var t = await game.ask_hex(p, "Bad day：选择一块正常组织转变为普通癌组织", targets)
 			if t != null:
 				game.board.infect(t)
 				game.log_line("🦠 一块正常组织被转变为癌组织。")
@@ -116,7 +116,7 @@ func _apply_card(p, cid: String) -> void:
 			var vessels := game.board.special_positions(CWData.SP_VESSEL)
 			if vessels.is_empty():
 				return
-			var v = await game.ask_hex(p.pname, "VEGF：选择要移动的血管", vessels)
+			var v = await game.ask_hex(p, "VEGF：选择要移动的血管", vessels)
 			if v == null:
 				v = vessels[0]
 			var dests: Array = []
@@ -128,7 +128,7 @@ func _apply_card(p, cid: String) -> void:
 					dests.append(h)
 			if dests.is_empty():
 				return
-			var dest = await game.ask_hex(p.pname, "VEGF：选择血管的新位置（1-3 步内，不与其他特殊事件重合）", dests)
+			var dest = await game.ask_hex(p, "VEGF：选择血管的新位置（1-3 步内，不与其他特殊事件重合）", dests)
 			if dest != null:
 				game.board.move_special(v, dest)
 				game.log_line("🩸 血管被移动了。")
@@ -151,7 +151,7 @@ func _apply_card(p, cid: String) -> void:
 		"dodge":
 			p.dodge_next = true
 		"excalibur":
-			var axis = await game.ask_option(p.pname, "Excalibur：选择净化的直线方向（以自己为中心）",
+			var axis = await game.ask_option(p, "Excalibur：选择净化的直线方向（以自己为中心）",
 				["东 — 西", "东北 — 西南", "西北 — 东南"], [0, 1, 2])
 			if axis == null:
 				axis = 0
@@ -170,7 +170,7 @@ func _apply_card(p, cid: String) -> void:
 			if targets.is_empty():
 				game.log_line("棋盘上没有普通癌组织，卡牌无效。")
 				return
-			var t = await game.ask_hex(p.pname, "Nuclear radiation：选择一块普通癌组织直接固化", targets)
+			var t = await game.ask_hex(p, "Nuclear radiation：选择一块普通癌组织直接固化", targets)
 			if t != null:
 				game.board.solidify_full(t)
 				game.log_line("🪨 一块普通癌组织被直接固化！")

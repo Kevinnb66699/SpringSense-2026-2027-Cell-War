@@ -24,6 +24,8 @@ func _init() -> void:
 	# 人机桥（全 AI 模式）：验证启发式策略的所有代码路径
 	await _run_hybrid_game(4, 55)
 	await _run_hybrid_game(6, 66)
+	# 联机锁步的根基：引擎确定性 + 答案线格式
+	await _test_determinism()
 	if failures == 0:
 		print("=== ALL TESTS PASSED ===")
 	else:
@@ -144,3 +146,46 @@ func _run_full_game(n_players: int, seed_value: int) -> void:
 	print("完整对局测试通过：%d 人局 seed=%d，%d 回合后 %s 获胜（%s）" %
 		[n_players, seed_value, game.round_num, CWData.faction_cn(game.winner), game.win_reason])
 	game.dispose()
+
+
+## 演示桥套上「线格式」编解码：证明所有请求的答案都能网络序列化且往返无损
+class CodecBridge extends DemoBridge:
+	var codec_failures := 0
+
+	func ask(req: Dictionary):
+		var v = await super.ask(req)
+		var wire = CWBridge.encode_answer(req, v)
+		var back = CWBridge.decode_answer(req, str_to_var(var_to_str(wire)))
+		if typeof(back) != typeof(v) or back != v:
+			codec_failures += 1
+			printerr("FAIL: 线格式往返损坏 type=%s wire=%s" % [req.get("type", ""), str(wire)])
+		return back
+
+
+## 确定性回归：同种子对局必须逐位一致（联机锁步的根基）；
+## 答案经线格式编解码后结果也不能变
+func _test_determinism() -> void:
+	var h1: int = await _hash_of_game(4, 77, false)
+	var h2: int = await _hash_of_game(4, 77, false)
+	var h3: int = await _hash_of_game(4, 77, true)
+	check(h1 == h2, "同种子两局结果不一致（引擎存在非确定性）")
+	check(h1 == h3, "答案经线格式编解码后对局结果改变")
+	print("确定性/线格式检查完成（同种子三局 state_hash 一致：%d）" % h1)
+
+
+func _hash_of_game(n_players: int, seed_value: int, use_codec: bool):
+	var bridge
+	if use_codec:
+		bridge = CodecBridge.new(seed_value)
+	else:
+		bridge = DemoBridge.new(seed_value)
+	bridge.tree = null
+	var game := CWGame.new(bridge, n_players, seed_value)
+	await game.run_setup()
+	await game.run_game()
+	check(game.game_over, "确定性测试对局未结束")
+	var h: int = game.state_hash()
+	if use_codec:
+		check(bridge.codec_failures == 0, "线格式编解码往返损坏 %d 次" % bridge.codec_failures)
+	game.dispose()
+	return h

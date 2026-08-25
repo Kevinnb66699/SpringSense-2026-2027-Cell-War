@@ -28,11 +28,11 @@ func apply(ev_id: String) -> void:
 				var targets := game.board.tissues_of_type(CWData.Tissue.CANCER)
 				if targets.is_empty() or p.biomass < 2:
 					continue
-				var yes = await game.ask_option(p.pname, "%s：是否失去 1 点生物质，净化任一普通癌组织？" % p.pname,
+				var yes = await game.ask_option(p, "%s：是否失去 1 点生物质，净化任一普通癌组织？" % p.pname,
 					["是（生物质-1）", "否"], [true, false])
 				if yes == true:
 					p.lose_biomass(1)
-					var t = await game.ask_hex(p.pname, "选择要净化的普通癌组织", targets)
+					var t = await game.ask_hex(p, "选择要净化的普通癌组织", targets)
 					if t != null:
 						game.board.purify(t)
 						game.log_line("☀️ %s 失去 1 点生物质，净化了一块癌组织。" % p.pname)
@@ -68,7 +68,7 @@ func apply(ev_id: String) -> void:
 						opts.append(n)
 				if opts.is_empty():
 					continue
-				var t = await game.ask_hex(p.pname, "%s：选择当前或周围一块组织进行感染（可跳过）" % p.pname, opts, "跳过")
+				var t = await game.ask_hex(p, "%s：选择当前或周围一块组织进行感染（可跳过）" % p.pname, opts, "跳过")
 				if t != null:
 					game.board.infect(t)
 					game.log_line("🦠 %s 感染了一块组织。" % p.pname)
@@ -81,7 +81,7 @@ func apply(ev_id: String) -> void:
 				var edges := game.board.buildable_edges(p.pos)
 				if edges.is_empty():
 					continue
-				var e = await game.ask_edge(p.pname, "%s：选择当前组织的一面生成墙壁（可跳过）" % p.pname, edges, "跳过")
+				var e = await game.ask_edge(p, "%s：选择当前组织的一面生成墙壁（可跳过）" % p.pname, edges, "跳过")
 				if e != null:
 					var cells := HexLib.edge_cells(e)
 					game.board.add_wall(cells[0], cells[1])
@@ -92,11 +92,11 @@ func apply(ev_id: String) -> void:
 				var targets := game.board.tissues_of_type(CWData.Tissue.NORMAL)
 				if targets.is_empty() or p.biomass < 2:
 					continue
-				var yes = await game.ask_option(p.pname, "%s：是否失去 1 点生物质，感染任一正常组织？" % p.pname,
+				var yes = await game.ask_option(p, "%s：是否失去 1 点生物质，感染任一正常组织？" % p.pname,
 					["是（生物质-1）", "否"], [true, false])
 				if yes == true:
 					p.lose_biomass(1)
-					var t = await game.ask_hex(p.pname, "选择要感染的正常组织", targets)
+					var t = await game.ask_hex(p, "选择要感染的正常组织", targets)
 					if t != null:
 						game.board.infect(t)
 						game.log_line("🦠 %s 失去 1 点生物质，感染了一块组织。" % p.pname)
@@ -151,7 +151,7 @@ func _event_revive_faction(faction: String) -> void:
 		if valid.is_empty():
 			game.log_line("%s 没有可复活的组织，无法复活。" % p.pname)
 			continue
-		var t = await game.ask_hex(p.pname, "%s 选择复活位置" % p.pname, valid)
+		var t = await game.ask_hex(p, "%s 选择复活位置" % p.pname, valid)
 		if t == null:
 			t = valid[0]
 		p.revive(t, 1)
@@ -169,7 +169,7 @@ func _event_set_biomass_one(chooser_faction: String, target_faction: String) -> 
 	var labels: Array = []
 	for t in targets:
 		labels.append("%s（生物质 %d）" % [t.pname, t.biomass])
-	var pick = await game.ask_option(CWData.faction_cn(chooser_faction) + "阵营",
+	var pick = await game.ask_option(chooser_faction,
 		"选择一名对方细胞，将其生物质降为 1", labels, targets)
 	if pick == null:
 		pick = targets[0]
@@ -192,7 +192,7 @@ func _event_weakening(chooser_faction: String) -> void:
 		for aid in c.abilities:
 			names.append(CWData.card_def(c.faction, aid)["name"])
 		labels.append("%s（%s）" % [c.pname, "、".join(names)])
-	var target = await game.ask_option(CWData.faction_cn(chooser_faction) + "阵营",
+	var target = await game.ask_option(chooser_faction,
 		"选择一名对方角色消除其一张能力牌", labels, candidates)
 	if target == null:
 		target = candidates[0]
@@ -200,7 +200,7 @@ func _event_weakening(chooser_faction: String) -> void:
 	for aid in target.abilities:
 		var cd := CWData.card_def(target.faction, aid)
 		alabels.append("%s：%s" % [cd["name"], cd["text"]])
-	var aid_pick = await game.ask_option(CWData.faction_cn(chooser_faction) + "阵营",
+	var aid_pick = await game.ask_option(chooser_faction,
 		"选择要消除的能力牌", alabels, target.abilities.duplicate())
 	if aid_pick == null:
 		aid_pick = target.abilities[0]

@@ -26,7 +26,7 @@ func run() -> void:
 
 
 func _setup_specials() -> void:
-	var mode = await game.ask_option("免疫阵营", "由免疫阵营决定特殊事件的位置",
+	var mode = await game.ask_option(CWData.FACTION_IMMUNE, "由免疫阵营决定特殊事件的位置",
 		["使用官方地图布局（推荐）", "自定义布置"], ["official", "custom"])
 	if mode == "official" or mode == null:
 		for h in CWData.OFFICIAL_LAYOUT:
@@ -45,7 +45,7 @@ func _setup_specials() -> void:
 		for h in HexLib.all_cells():
 			if not game.board.specials.has(h):
 				free.append(h)
-		var pick = await game.ask_hex("免疫阵营", "放置【%s】" % item[1], free)
+		var pick = await game.ask_hex(CWData.FACTION_IMMUNE, "放置【%s】" % item[1], free)
 		if pick == null:
 			pick = free[0]
 		game.board.place_special(pick, item[0])
@@ -70,7 +70,7 @@ func _setup_cancer_tissues() -> void:
 	if official_ok:
 		labels.push_front("官方示例布局（中心花型）")
 		values.push_front("official")
-	var mode = await game.ask_option("癌细胞阵营", "由癌细胞阵营选择 7 块癌组织（不能在特殊事件及其周围）", labels, values)
+	var mode = await game.ask_option(CWData.FACTION_CANCER, "由癌细胞阵营选择 7 块癌组织（不能在特殊事件及其周围）", labels, values)
 	if mode == "official":
 		for h in official:
 			game.board.tissue[h] = CWData.Tissue.CANCER
@@ -82,7 +82,7 @@ func _setup_cancer_tissues() -> void:
 		for h in HexLib.all_cells():
 			if not forbidden.has(h) and game.board.tissue_at(h) == CWData.Tissue.NORMAL:
 				valid.append(h)
-		var pick = await game.ask_hex("癌细胞阵营", "选择第 %d/7 块癌组织" % (i + 1), valid)
+		var pick = await game.ask_hex(CWData.FACTION_CANCER, "选择第 %d/7 块癌组织" % (i + 1), valid)
 		if pick == null:
 			pick = valid[0]
 		game.board.tissue[pick] = CWData.Tissue.CANCER
@@ -101,7 +101,7 @@ func _setup_positions() -> void:
 				if game.board.tissue_at(h) == CWData.Tissue.NORMAL:
 					valid.append(h)
 		var tip := "癌组织" if p.is_cancer() else "正常组织"
-		var pick = await game.ask_hex(p.pname, "%s 选择初始位置（%s）" % [p.pname, tip], valid, "", {"tag": "setup_pos"})
+		var pick = await game.ask_hex(p, "%s 选择初始位置（%s）" % [p.pname, tip], valid, "", {"tag": "setup_pos"})
 		if pick == null:
 			pick = valid[0]
 		p.pos = pick

@@ -1,7 +1,7 @@
 class_name HybridBridge
 extends CWBridge
 ## 人机对弈桥：人类阵营的决策交给界面等待点击，AI 阵营用启发式策略自动决策。
-## 决策归属通过请求的 who 字段判断（"免疫×" / "癌×"，词表由 cw_game 控制）。
+## 决策归属通过请求的 owner_faction 字段判断（由 cw_game 的 ask_* 统一填写）。
 ## human_faction 为空字符串时双方都由 AI 操作（用于测试）。
 
 var game = null                  # CWGame（_start 后由 main 赋值，AI 决策需要读取局面）
@@ -40,14 +40,9 @@ func answer(v) -> void:
 
 
 func _is_human(req: Dictionary) -> bool:
-	var who: String = req.get("who", "")
-	var f := ""
-	if who.contains("免疫"):
-		f = CWData.FACTION_IMMUNE
-	elif who.contains("癌"):
-		f = CWData.FACTION_CANCER
-	else:
-		return true   # 无法判断归属时交给人类，保证不吞决策
+	var f: String = req.get("owner_faction", "")
+	if f == "":
+		return true   # 无归属信息时交给人类，保证不吞决策
 	return f == human_faction
 
 

@@ -128,28 +128,44 @@ func d6(reason: String = "") -> int:
 	return v
 
 
-func ask_option(who: String, prompt: String, labels: Array, values: Array, cancel: String = ""):
-	return await bridge.ask({
-		"type": "pick_option", "who": who, "prompt": prompt,
-		"labels": labels, "values": values, "cancel": cancel,
-	})
+## 决策归属字段（联机路由预留）。who 接受两种形式：
+##   CWPlayer —— 个人决策，请求带 owner_id（玩家 id）与 owner_faction
+##   阵营常量 CWData.FACTION_* —— 阵营级决策，owner_id 为 -1
+## req.who 仍是显示用字符串，UI 不受影响。
+func _who_fields(who) -> Dictionary:
+	if who is CWPlayer:
+		return {"who": who.pname, "owner_id": who.id, "owner_faction": who.faction}
+	return {"who": CWData.faction_cn(who) + "阵营", "owner_id": -1, "owner_faction": who}
 
 
-func ask_hex(who: String, prompt: String, options: Array, cancel: String = "", extra: Dictionary = {}):
-	var req := {
-		"type": "pick_hex", "who": who, "prompt": prompt,
-		"options": options, "cancel": cancel,
-	}
+func ask_option(who, prompt: String, labels: Array, values: Array, cancel: String = ""):
+	var req := _who_fields(who)
+	req["type"] = "pick_option"
+	req["prompt"] = prompt
+	req["labels"] = labels
+	req["values"] = values
+	req["cancel"] = cancel
+	return await bridge.ask(req)
+
+
+func ask_hex(who, prompt: String, options: Array, cancel: String = "", extra: Dictionary = {}):
+	var req := _who_fields(who)
+	req["type"] = "pick_hex"
+	req["prompt"] = prompt
+	req["options"] = options
+	req["cancel"] = cancel
 	for k in extra:
 		req[k] = extra[k]
 	return await bridge.ask(req)
 
 
-func ask_edge(who: String, prompt: String, options: Array, cancel: String = ""):
-	return await bridge.ask({
-		"type": "pick_edge", "who": who, "prompt": prompt,
-		"options": options, "cancel": cancel,
-	})
+func ask_edge(who, prompt: String, options: Array, cancel: String = ""):
+	var req := _who_fields(who)
+	req["type"] = "pick_edge"
+	req["prompt"] = prompt
+	req["options"] = options
+	req["cancel"] = cancel
+	return await bridge.ask(req)
 
 
 func living_players(faction: String = "") -> Array:
@@ -192,6 +208,35 @@ func attack_dist(atk, tgt_pos: Vector2i, max_range: int) -> int:
 
 func win_threshold() -> int:
 	return CWData.WIN_TISSUE_4P if num_players == 4 else CWData.WIN_TISSUE_6P
+
+
+## 局面摘要哈希：确定性回归测试用；将来联机锁步时各端定期比对以检测失步。
+## ⚠️ 引擎新增影响规则的状态时，记得把它加进这里。
+func state_hash() -> int:
+	var parts: Array = [round_num, cur_player_idx, game_over, winner, extra_moves,
+		flag_all_crit, flag_walls_off, flag_immune_atk, flag_immune_rage,
+		flag_move_bonus_immune, flag_move_bonus_cancer, flag_no_attack, flag_rest,
+		perm_wall_bonus, perm_bio_bonus, used_limited]
+	var hexes := board.tissue.keys()
+	hexes.sort()
+	for h in hexes:
+		parts.append([h, board.tissue[h], board.solid_count.get(h, 0)])
+	var sp_keys := board.specials.keys()
+	sp_keys.sort()
+	for h in sp_keys:
+		parts.append([h, board.specials[h]["kind"], board.specials[h]["active"]])
+	var wall_keys := board.walls.keys()
+	wall_keys.sort()
+	parts.append(wall_keys)
+	for p in players:
+		parts.append([p.pos, p.alive, p.biomass, p.evo, p.abilities,
+			p.walls_stock, p.kills, p.stunned, p.skip_this_round, p.vulnerable,
+			p.dodge_next, p.keratin_next, p.infdiv_next,
+			p.next_atk_power, p.next_atk_range, p.next_atk_sure, p.last_dir])
+	for f in [CWData.FACTION_IMMUNE, CWData.FACTION_CANCER]:
+		var d: CWDeck = decks[f]
+		parts.append([d.draw_pile, d.discard_pile])
+	return hash(parts)
 
 
 # ==================== 主流程 ====================

@@ -28,7 +28,7 @@ func attack_check(p) -> void:
 		var opts: Array = []
 		for c in targets:
 			opts.append(c.pos)
-		var pos_pick = await game.ask_hex(p.pname, "%s：选择攻击目标" % p.pname, opts, "", {"tag": "attack_target", "actor": p})
+		var pos_pick = await game.ask_hex(p, "%s：选择攻击目标" % p.pname, opts, "", {"tag": "attack_target", "actor": p})
 		if pos_pick != null:
 			for c in targets:
 				if c.pos == pos_pick:
@@ -36,7 +36,7 @@ func attack_check(p) -> void:
 					break
 	var dir: int = p.last_dir
 	if dir < 0:
-		var dpick = await game.ask_option(p.pname, "%s：本回合未移动，选择攻击/击退方向" % p.pname,
+		var dpick = await game.ask_option(p, "%s：本回合未移动，选择攻击/击退方向" % p.pname,
 			HexLib.DIR_NAMES.duplicate(), [0, 1, 2, 3, 4, 5])
 		dir = 0 if dpick == null else dpick
 	await _perform_attack(p, target, dir, false)
@@ -171,7 +171,7 @@ func _knockback(tgt, dir: int, n: int, from_attacker) -> void:
 		var labels: Array = []
 		for q in candidates:
 			labels.append(q.pname)
-		var pick = await game.ask_option("免疫阵营", "双重打击！选择由哪名免疫细胞追击 %s" % tgt.pname, labels, candidates)
+		var pick = await game.ask_option(CWData.FACTION_IMMUNE, "双重打击！选择由哪名免疫细胞追击 %s" % tgt.pname, labels, candidates)
 		if pick != null:
 			striker = pick
 	game.log_line("⚡ 双重打击！%s 追击 %s！" % [striker.pname, tgt.pname])

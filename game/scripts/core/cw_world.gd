@@ -74,7 +74,7 @@ func _evolution_draft() -> void:
 				values.append(e["id"])
 		if values.is_empty():
 			continue
-		var pick = await game.ask_option(p.pname, "%s 选择进化能力（不可与队友重复）" % p.pname, labels, values)
+		var pick = await game.ask_option(p, "%s 选择进化能力（不可与队友重复）" % p.pname, labels, values)
 		if pick == null:
 			pick = values[0]
 		p.evo = pick

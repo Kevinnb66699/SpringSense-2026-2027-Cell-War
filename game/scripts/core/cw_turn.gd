@@ -114,9 +114,9 @@ func _try_revive(p) -> void:
 		return
 	labels.append("放弃复活")
 	values.append("skip")
-	var mode = await game.ask_option(p.pname, "%s 已死亡，是否复活？" % p.pname, labels, values)
+	var mode = await game.ask_option(p, "%s 已死亡，是否复活？" % p.pname, labels, values)
 	if mode == "solid":
-		var t = await game.ask_hex(p.pname, "选择复活的固化癌组织", solids)
+		var t = await game.ask_hex(p, "选择复活的固化癌组织", solids)
 		if t == null:
 			t = solids[0]
 		game.board.unsolidify(t)
@@ -133,12 +133,12 @@ func _try_revive(p) -> void:
 				dlabels.append("%s（生物质 %d）" % [q.pname, q.biomass])
 		if donors.is_empty():
 			return
-		var donor = await game.ask_option(p.pname, "选择消耗哪名队友的 1 点生物质", dlabels, donors)
+		var donor = await game.ask_option(p, "选择消耗哪名队友的 1 点生物质", dlabels, donors)
 		if donor == null:
 			donor = donors[0]
 		donor.lose_biomass(1)
 		var tissues := game.board.cancer_tissues()
-		var t = await game.ask_hex(p.pname, "选择复活的癌组织", tissues)
+		var t = await game.ask_hex(p, "选择复活的癌组织", tissues)
 		if t == null:
 			t = tissues[0]
 		p.revive(t, 1)
@@ -163,7 +163,7 @@ func offer_evo_swap(p) -> void:
 			values.append(e["id"])
 	if values.size() <= 1:
 		return
-	var pick = await game.ask_option(p.pname, "%s 复活后可更换一个未被选择的进化能力" % p.pname, labels, values)
+	var pick = await game.ask_option(p, "%s 复活后可更换一个未被选择的进化能力" % p.pname, labels, values)
 	if pick != null and pick != "keep":
 		p.evo = pick
 		game.log_line("🧬 %s 更换进化能力为【%s】。" % [p.pname, CWData.evo_def(p.faction, pick)["name"]])
@@ -202,7 +202,7 @@ func _pool_draw_judgment(p) -> void:
 		var labels: Array = []
 		for q in here:
 			labels.append(q.pname)
-		var pick = await game.ask_option(p.pname, "同阵营玩家位于同一卡池，商议由谁抽卡", labels, here)
+		var pick = await game.ask_option(p, "同阵营玩家位于同一卡池，商议由谁抽卡", labels, here)
 		if pick != null:
 			drawer = pick
 	await game.cards.draw_card(drawer)
@@ -227,7 +227,7 @@ func _free_draw_phase(p) -> void:
 			return
 		labels.append("结束抽卡阶段")
 		values.append("done")
-		var pick = await game.ask_option(p.pname, "%s：自由抽卡（生物质 %d）" % [p.pname, p.biomass], labels, values)
+		var pick = await game.ask_option(p, "%s：自由抽卡（生物质 %d）" % [p.pname, p.biomass], labels, values)
 		if pick == null or pick == "done":
 			return
 		if pick == "burn":
@@ -271,7 +271,7 @@ func _special_phase(p) -> void:
 		return
 	labels.append("跳过特殊行动")
 	values.append("skip")
-	var pick = await game.ask_option(p.pname, "%s：选择特殊行动（每回合一种）" % p.pname, labels, values)
+	var pick = await game.ask_option(p, "%s：选择特殊行动（每回合一种）" % p.pname, labels, values)
 	if pick == null or pick == "skip":
 		return
 	match pick:
@@ -283,7 +283,7 @@ func _special_phase(p) -> void:
 			var adj := game.board.walls_adjacent_to(p.pos)
 			var e = adj[0]
 			if adj.size() > 1:
-				var epick = await game.ask_edge(p.pname, "选择要拆除的墙壁（连通的墙壁将一并拆除）", adj)
+				var epick = await game.ask_edge(p, "选择要拆除的墙壁（连通的墙壁将一并拆除）", adj)
 				if epick != null:
 					e = epick
 			var connected := game.board.connected_walls(e)
@@ -308,7 +308,7 @@ func _special_phase(p) -> void:
 				var edges := game.board.buildable_edges(p.pos)
 				if edges.is_empty():
 					break
-				var epick2 = await game.ask_edge(p.pname, "选择建造墙壁的位置（持有 %d 枚）" % p.walls_stock, edges, "完成建造")
+				var epick2 = await game.ask_edge(p, "选择建造墙壁的位置（持有 %d 枚）" % p.walls_stock, edges, "完成建造")
 				if epick2 == null:
 					break
 				var cells := HexLib.edge_cells(epick2)
