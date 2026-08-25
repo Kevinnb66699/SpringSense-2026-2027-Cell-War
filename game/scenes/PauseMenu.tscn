@@ -3,17 +3,27 @@
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_pause"]
 
 [node name="PauseMenu" type="Control"]
-process_mode = 4
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_pause")
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Body" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="Body"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +32,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.55)
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Center" type="CenterContainer" parent="Body"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,42 +40,44 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Center"]
+[node name="Panel" type="PanelContainer" parent="Body/Center"]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 
-[node name="VBox" type="VBoxContainer" parent="Center/Panel"]
+[node name="VBox" type="VBoxContainer" parent="Body/Center/Panel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Center/Panel/VBox"]
+[node name="Title" type="Label" parent="Body/Center/Panel/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.560784, 0.839216, 0.909804, 1)
 theme_override_font_sizes/font_size = 28
 text = "已暂停"
 horizontal_alignment = 1
 
-[node name="BtnResume" type="Button" parent="Center/Panel/VBox"]
+[node name="BtnResume" type="Button" parent="Body/Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "继续游戏（Esc）"
 
-[node name="BtnFullscreen" type="Button" parent="Center/Panel/VBox"]
+[node name="BtnFullscreen" type="Button" parent="Body/Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "切换全屏"
 
-[node name="BtnMenu" type="Button" parent="Center/Panel/VBox"]
+[node name="BtnMenu" type="Button" parent="Body/Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "放弃对局，返回主菜单"
 
-[node name="BtnQuit" type="Button" parent="Center/Panel/VBox"]
+[node name="BtnQuit" type="Button" parent="Body/Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "退出游戏"
 
-[node name="Hint" type="Label" parent="Center/Panel/VBox"]
+[node name="Hint" type="Label" parent="Body/Center/Panel/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.490196, 0.580392, 0.619608, 1)
 theme_override_font_sizes/font_size = 13

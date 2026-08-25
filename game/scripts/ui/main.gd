@@ -143,9 +143,9 @@ func _on_log(text: String) -> void:
 # ==================== 暂停菜单 ====================
 
 func _on_pause_requested() -> void:
-	# 只在对局进行中响应 Esc；主菜单界面下无事发生
-	if game != null and not game.game_over and not menu_screen.visible:
-		pause_menu.open()
+	# 对局进行中 → 完整暂停菜单；主菜单/结算界面 → 精简菜单（全屏/退出）
+	var in_game: bool = game != null and not game.game_over and not menu_screen.visible
+	pause_menu.open(in_game)
 
 
 ## 放弃当前对局返回主菜单。旧局协程可能还挂在某个 await 上，
@@ -156,6 +156,7 @@ func _abandon_to_menu() -> void:
 	var old = game
 	game = null
 	board_view.game = null
+	side_panel.visible = false   # 放弃的对局，侧栏状态一并收起
 	clear_request()
 	old.game_over = true
 	old.win_reason = "对局已放弃"
