@@ -22,7 +22,8 @@ func show_roll(reason: String, value: int) -> void:
 
 func ask(req: Dictionary):
 	if tree != null and delay > 0.0:
-		await tree.create_timer(delay).timeout
+		# process_always=false：树暂停（Esc 菜单）时计时器停走，AI 流程随之冻结
+		await tree.create_timer(delay, false).timeout
 	var t: String = req.get("type", "")
 	var cancel: String = req.get("cancel", "")
 	if t == "pick_option":

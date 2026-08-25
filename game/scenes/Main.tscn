@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main.gd" id="1_main"]
 [ext_resource type="Theme" path="res://scenes/ui_theme.tres" id="2_theme"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/ui/dice_overlay.gd" id="4_dice"]
 [ext_resource type="PackedScene" path="res://scenes/SidePanel.tscn" id="5_side"]
 [ext_resource type="PackedScene" path="res://scenes/MenuScreen.tscn" id="6_menu"]
+[ext_resource type="PackedScene" path="res://scenes/PauseMenu.tscn" id="7_pause"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -69,6 +70,15 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="MenuScreen" parent="." instance=ExtResource("6_menu")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

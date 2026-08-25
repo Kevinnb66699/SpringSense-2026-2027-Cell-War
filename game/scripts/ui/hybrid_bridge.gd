@@ -31,7 +31,8 @@ func ask(req: Dictionary):
 		main.clear_request()
 		return v
 	if tree != null and ai_delay > 0.0:
-		await tree.create_timer(ai_delay).timeout
+		# process_always=false：树暂停（Esc 菜单）时计时器停走，AI 流程随之冻结
+		await tree.create_timer(ai_delay, false).timeout
 	return _ai_decide(req)
 
 

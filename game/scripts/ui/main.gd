@@ -7,13 +7,17 @@ extends Control
 ##   show_request(req) / clear_request() / play_dice(reason, value, fast)
 
 var game = null      # CWGame
-var bridge = null    # UIBridge / HybridBridge / DemoBridge
+var bridge = null    # UIBridge / HybridBridge / DemoBridge / MCBridge
 var pending_req: Dictionary = {}
+
+## 被放弃的对局：协程还挂在栈上不能立即 dispose，攒到下一次开局时再断环
+var _zombies: Array = []
 
 @onready var board_view: BoardView = %BoardView
 @onready var dice_overlay: DiceOverlay = %DiceOverlay
 @onready var side_panel: SidePanel = %SidePanel
 @onready var menu_screen: MenuScreen = %MenuScreen
+@onready var pause_menu: PauseMenu = %PauseMenu
 
 
 func _ready() -> void:
@@ -21,6 +25,8 @@ func _ready() -> void:
 	side_panel.option_pressed.connect(_on_option_pressed)
 	board_view.hex_clicked.connect(_on_board_hex)
 	board_view.edge_clicked.connect(_on_board_edge)
+	pause_menu.open_requested.connect(_on_pause_requested)
+	pause_menu.menu_requested.connect(_abandon_to_menu)
 	menu_screen.show_menu("")
 
 
@@ -38,6 +44,9 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 	side_panel.visible = true
 	side_panel.clear_log()
 	pending_req = {}
+	for z in _zombies:
+		z.dispose()
+	_zombies.clear()
 	if mode == "demo":
 		bridge = DemoBridge.new()
 		bridge.tree = get_tree()
@@ -129,3 +138,30 @@ func _on_board_edge(k: String) -> void:
 
 func _on_log(text: String) -> void:
 	side_panel.add_log(text)
+
+
+# ==================== 暂停菜单 ====================
+
+func _on_pause_requested() -> void:
+	# 只在对局进行中响应 Esc；主菜单界面下无事发生
+	if game != null and not game.game_over and not menu_screen.visible:
+		pause_menu.open()
+
+
+## 放弃当前对局返回主菜单。旧局协程可能还挂在某个 await 上，
+## 强制 game_over 让引擎在下一个检查点自然退出；本体攒进 _zombies 延后 dispose。
+func _abandon_to_menu() -> void:
+	if game == null:
+		return
+	var old = game
+	game = null
+	board_view.game = null
+	clear_request()
+	old.game_over = true
+	old.win_reason = "对局已放弃"
+	if old.bridge != null:
+		old.bridge.log_added.disconnect(_on_log)
+		if old.bridge.has_method("answer"):
+			old.bridge.answer(null)   # 若正等人类点击，用取消放行协程
+	_zombies.append(old)
+	menu_screen.show_menu("")

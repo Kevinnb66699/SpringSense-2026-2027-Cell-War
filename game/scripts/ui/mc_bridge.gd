@@ -72,7 +72,7 @@ func ask(req: Dictionary):
 		v = await _mc_decide(req)
 	else:
 		if tree != null and ai_delay > 0.0:
-			await tree.create_timer(ai_delay).timeout
+			await tree.create_timer(ai_delay, false).timeout
 		v = _ai_decide(req)
 	_turn_log.append(CWBridge.encode_answer(req, v))
 	return v
@@ -110,6 +110,8 @@ func _mc_decide(req: Dictionary):
 			total += await _playout_score(w, fac, seeds[k], live_hash)
 		if tree != null:
 			await tree.process_frame   # 别把 UI 冻死
+			while tree.paused:         # Esc 暂停时搜索也停住
+				await tree.process_frame
 		var avg := total / float(playouts)
 		if w == h_wire:
 			avg += prior_bonus

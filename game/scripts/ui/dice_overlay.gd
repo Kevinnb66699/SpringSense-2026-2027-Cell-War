@@ -53,12 +53,13 @@ func play(reason: String, value: int, fast: bool) -> void:
 		face = nf
 		rolling = true
 		queue_redraw()
-		await get_tree().create_timer(interval).timeout
+		# process_always=false：Esc 暂停时动画计时器停走
+		await get_tree().create_timer(interval, false).timeout
 		interval *= 1.16
 	face = value
 	rolling = false
 	queue_redraw()
-	await get_tree().create_timer(0.35 if fast else 0.6).timeout
+	await get_tree().create_timer(0.35 if fast else 0.6, false).timeout
 	visible = false
 
 
