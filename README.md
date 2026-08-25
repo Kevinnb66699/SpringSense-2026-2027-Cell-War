@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/Kevinnb66699/SpringSense-2026-2027-Cell-War/actions/workflows/tests.yml/badge.svg)](https://github.com/Kevinnb66699/SpringSense-2026-2027-Cell-War/actions/workflows/tests.yml)
 
-《Cell War》是一款免疫细胞 vs 癌细胞的对抗桌游（ver.0.98）。本仓库是其电子化版本，使用 **Godot 4** 引擎开发。
+《Cell War》是一款免疫细胞 vs 癌细胞的对抗桌游（ver.0.98）。本仓库是其电子化版本，使用 **Godot 4.5 stable** 引擎开发。
 
 ## 仓库结构
 
@@ -14,12 +14,12 @@
 │   └── obsidian/              由手册生成的细粒度 Obsidian 笔记库（125 篇，一概念一笔记）
 ├── tools/
 │   └── draw_ver0.98/          原有的 Python 抽卡/世界事件脚本（桌面版辅助工具，保留存档）
-└── game/                      Godot 4 工程（电子版游戏本体）
+└── game/                      Godot 4.5 工程（电子版游戏本体）
 ```
 
 ## 如何运行
 
-1. 安装 [Godot 4.3+](https://godotengine.org/download)（标准版即可，无需 .NET 版）。
+1. 安装 [Godot 4.5 stable](https://godotengine.org/download)（标准版即可，无需 .NET 版；开发与 CI 均基于此版本）。
 2. 打开 Godot → Import → 选择 `game/project.godot`。
 3. 按 F5 运行。
 
@@ -41,6 +41,6 @@
 
 ## 开发说明
 
-- 引擎：Godot 4.x，语言：GDScript。
+- 引擎：Godot 4.5 stable，语言：GDScript。
 - `game/scripts/core/` 为纯规则逻辑（不依赖场景节点，便于测试与将来联机复用）；`game/scripts/ui/` 为界面层。
 - 规则引擎按功能拆分模块：`cw_game.gd` 持有状态与总调度，具体流程分别在 `cw_setup / cw_world / cw_events / cw_turn / cw_movement / cw_combat / cw_cards`，改哪个功能就改对应文件。
