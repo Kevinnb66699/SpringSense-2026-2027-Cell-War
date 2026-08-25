@@ -43,3 +43,4 @@
 
 - 引擎：Godot 4.x，语言：GDScript。
 - `game/scripts/core/` 为纯规则逻辑（不依赖场景节点，便于测试与将来联机复用）；`game/scripts/ui/` 为界面层。
+- 规则引擎按功能拆分模块：`cw_game.gd` 持有状态与总调度，具体流程分别在 `cw_setup / cw_world / cw_events / cw_turn / cw_movement / cw_combat / cw_cards`，改哪个功能就改对应文件。

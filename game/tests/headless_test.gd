@@ -107,6 +107,7 @@ func _run_hybrid_game(n_players: int, seed_value: int) -> void:
 		check(HexLib.in_board(p.pos), "AI 对局 %s 位置在棋盘外" % p.pname)
 	print("AI 策略对局测试通过：%d 人局 seed=%d，%s 获胜（%s）" %
 		[n_players, seed_value, CWData.faction_cn(game.winner), game.win_reason])
+	game.dispose()
 
 
 func _run_full_game(n_players: int, seed_value: int) -> void:
@@ -142,3 +143,4 @@ func _run_full_game(n_players: int, seed_value: int) -> void:
 	check(game.board.tissue.size() == 61, "组织总数应恒为 61")
 	print("完整对局测试通过：%d 人局 seed=%d，%d 回合后 %s 获胜（%s）" %
 		[n_players, seed_value, game.round_num, CWData.faction_cn(game.winner), game.win_reason])
+	game.dispose()

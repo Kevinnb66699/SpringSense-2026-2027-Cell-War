@@ -285,6 +285,8 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 		bridge = UIBridge.new()
 		bridge.main = self
 	bridge.log_added.connect(_on_log)
+	if game != null and game.game_over:
+		game.dispose()
 	game = CWGame.new(bridge, n_players)
 	if bridge is HybridBridge:
 		bridge.game = game
