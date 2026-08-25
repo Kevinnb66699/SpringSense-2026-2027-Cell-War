@@ -25,8 +25,6 @@ func _pick(n_players: int, mode: String, human_faction: String) -> void:
 	start_requested.emit(n_players, mode, human_faction)
 
 
-## 显示菜单；result_text 非空时在标题下方展示上一局结果
-func show_menu(result_text: String) -> void:
-	%ResultLabel.text = result_text
-	%ResultLabel.visible = result_text != ""
+## 显示主菜单（上一局结果由 ResultScreen 结算页负责展示，不在这里）
+func show_menu() -> void:
 	visible = true

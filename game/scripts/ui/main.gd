@@ -18,6 +18,7 @@ var _zombies: Array = []
 @onready var side_panel: SidePanel = %SidePanel
 @onready var menu_screen: MenuScreen = %MenuScreen
 @onready var pause_menu: PauseMenu = %PauseMenu
+@onready var result_screen: ResultScreen = %ResultScreen
 
 
 func _ready() -> void:
@@ -27,7 +28,8 @@ func _ready() -> void:
 	board_view.edge_clicked.connect(_on_board_edge)
 	pause_menu.open_requested.connect(_on_pause_requested)
 	pause_menu.menu_requested.connect(_abandon_to_menu)
-	menu_screen.show_menu("")
+	result_screen.menu_requested.connect(_on_result_back)
+	menu_screen.show_menu()
 
 
 func _process(_delta: float) -> void:
@@ -73,8 +75,6 @@ func _start(n_players: int, mode: String, human_faction: String) -> void:
 		bridge = UIBridge.new()
 		bridge.main = self
 	bridge.log_added.connect(_on_log)
-	if game != null and game.game_over:
-		game.dispose()
 	game = CWGame.new(bridge, n_players)
 	if bridge is MCBridge:
 		bridge.game = game
@@ -102,7 +102,7 @@ func _run_async() -> void:
 	await g.run_game()
 	if g != game:
 		return
-	menu_screen.show_menu(game.win_reason)
+	result_screen.show_result(g)   # 先弹结算页，点「返回主界面」才回主菜单
 
 
 # ==================== 问答桥入口 ====================
@@ -175,4 +175,15 @@ func _abandon_to_menu() -> void:
 		if old.bridge.has_method("answer"):
 			old.bridge.answer(null)   # 若正等人类点击，用取消放行协程
 	_zombies.append(old)
-	menu_screen.show_menu("")
+	menu_screen.show_menu()
+
+
+## 结算页点「返回主界面」：对局已自然结束、协程已退出栈，可直接释放
+func _on_result_back() -> void:
+	var old = game
+	game = null
+	board_view.game = null
+	side_panel.visible = false
+	old.bridge.log_added.disconnect(_on_log)
+	old.dispose()
+	menu_screen.show_menu()
