@@ -105,7 +105,7 @@ text = "6 人局"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.603922, 0.701961, 0.741176, 1)
 theme_override_font_sizes/font_size = 14
-text = "蒙特卡洛 AI · 实验（免疫由推演搜索操控，思考时会稍有停顿）"
+text = "蒙特卡洛 AI · 实验（一方由推演搜索操控，思考时会稍有停顿）"
 
 [node name="RowMc" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
 layout_mode = 2
@@ -117,11 +117,27 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "执癌症 · 对抗 MC 免疫"
 
-[node name="BtnMcWatch" type="Button" parent="MenuPanel/MenuVBox/RowMc"]
+[node name="BtnMcImmune" type="Button" parent="MenuPanel/MenuVBox/RowMc"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "执免疫 · 对抗 MC 癌症"
+
+[node name="RowMcWatch" type="HBoxContainer" parent="MenuPanel/MenuVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnMcWatchImmune" type="Button" parent="MenuPanel/MenuVBox/RowMcWatch"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "观战 · MC 免疫 vs 启发式"
+
+[node name="BtnMcWatchCancer" type="Button" parent="MenuPanel/MenuVBox/RowMcWatch"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "观战 · MC 癌症 vs 启发式"
 
 [node name="SectionDemo" type="Label" parent="MenuPanel/MenuVBox"]
 layout_mode = 2

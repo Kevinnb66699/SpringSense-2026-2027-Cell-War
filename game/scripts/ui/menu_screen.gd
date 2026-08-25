@@ -14,7 +14,9 @@ func _ready() -> void:
 	%BtnPvp4.pressed.connect(_pick.bind(4, "pvp", ""))
 	%BtnPvp6.pressed.connect(_pick.bind(6, "pvp", ""))
 	%BtnMcCancer.pressed.connect(_pick.bind(4, "mc", CWData.FACTION_CANCER))
-	%BtnMcWatch.pressed.connect(_pick.bind(4, "mc_watch", ""))
+	%BtnMcImmune.pressed.connect(_pick.bind(4, "mc", CWData.FACTION_IMMUNE))
+	%BtnMcWatchImmune.pressed.connect(_pick.bind(4, "mc_watch_immune", ""))
+	%BtnMcWatchCancer.pressed.connect(_pick.bind(4, "mc_watch_cancer", ""))
 	%BtnDemo4.pressed.connect(_pick.bind(4, "demo", ""))
 	%BtnDemo6.pressed.connect(_pick.bind(6, "demo", ""))
 
